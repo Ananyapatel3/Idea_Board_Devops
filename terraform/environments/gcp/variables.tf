@@ -42,3 +42,12 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+
+variable "control_plane_authorized_cidrs" {
+  type        = list(string)
+  description = "Public client CIDR ranges permitted to connect to the GKE API"
+  validation {
+    condition     = length(var.control_plane_authorized_cidrs) > 0
+    error_message = "Provide at least one trusted CIDR for the GKE control plane."
+  }
+}

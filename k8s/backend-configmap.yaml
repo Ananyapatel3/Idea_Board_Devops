@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: idea-board
+data:
+  CORS_ORIGINS: "http://localhost:3000"

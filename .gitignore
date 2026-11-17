@@ -3,17 +3,21 @@
 *.tfstate.backup
 *.tfvars
 .terraform/
-.terraform.lock.hcl
 tfplan
 
 # Python
 __pycache__/
 *.pyc
 .env
+.pytest_cache/
 
 # Node
 node_modules/
 frontend/dist/
+
+# Local and generated files
+*.log
+coverage/
 
 # AI outputs
 ai_health_report.json

@@ -1,18 +1,25 @@
+import logging
 import os
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 
 import models
 import schemas
-from database import engine, get_db, Base
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from database import Base, engine, get_db
 
 Base.metadata.create_all(bind=engine)
 
+logger = logging.getLogger(__name__)
 app = FastAPI(title="Idea Board API")
 
-origins = os.environ.get("CORS_ORIGINS", "*").split(",")
+origins = [
+    origin.strip()
+    for origin in os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(",")
+    if origin.strip()
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +36,13 @@ def health_check(db: Session = Depends(get_db)):
         db.execute(text("SELECT 1"))
         return {"status": "ok", "db": "connected"}
     except Exception:
+        logger.exception("Database health check failed")
         raise HTTPException(status_code=503, detail={"status": "error", "db": "unreachable"})
+
+
+@app.get("/live")
+def liveness_check():
+    return {"status": "ok"}
 
 
 @app.get("/api/ideas", response_model=list[schemas.IdeaResponse])

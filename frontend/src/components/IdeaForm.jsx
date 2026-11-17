@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { normalizeIdeaContent } from '../validation'
 
 export default function IdeaForm({ onIdeaAdded }) {
   const [content, setContent] = useState('')
@@ -7,7 +8,8 @@ export default function IdeaForm({ onIdeaAdded }) {
 
   function handleSubmit(e) {
     e.preventDefault()
-    if (!content.trim()) return
+    const normalizedContent = normalizeIdeaContent(content)
+    if (!normalizedContent) return
 
     setSubmitting(true)
     setError(null)
@@ -15,7 +17,7 @@ export default function IdeaForm({ onIdeaAdded }) {
     fetch('/api/ideas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: content.trim() })
+      body: JSON.stringify({ content: normalizedContent })
     })
       .then(res => {
         if (!res.ok) throw new Error('Failed to submit idea')
@@ -50,7 +52,7 @@ export default function IdeaForm({ onIdeaAdded }) {
           <button
             type="submit"
             className="submit-btn"
-            disabled={!content.trim() || submitting}
+            disabled={!normalizeIdeaContent(content) || submitting}
           >
             {submitting ? 'Saving...' : 'Add Idea'}
           </button>

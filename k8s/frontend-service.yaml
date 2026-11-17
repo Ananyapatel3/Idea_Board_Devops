@@ -3,9 +3,6 @@ kind: Service
 metadata:
   name: frontend
   namespace: idea-board
-  annotations:
-    # AWS annotation
-    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 spec:
   type: LoadBalancer
   selector:

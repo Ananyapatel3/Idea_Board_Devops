@@ -21,9 +21,19 @@ spec:
       containers:
         - name: backend
           image: ghcr.io/sirhashir/idea-board-backend:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 8000
           envFrom:
+            - configMapRef:
+                name: backend-config
             - secretRef:
                 name: backend-secrets
           resources:
@@ -35,9 +45,9 @@ spec:
               memory: 256Mi
           livenessProbe:
             httpGet:
-              path: /health
+              path: /live
               port: 8000
-            initialDelaySeconds: 15
+            initialDelaySeconds: 5
             periodSeconds: 10
             failureThreshold: 3
           readinessProbe:
@@ -47,3 +57,9 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
             failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /live
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 12
