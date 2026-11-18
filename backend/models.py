@@ -1,6 +1,5 @@
-from sqlalchemy import Column, DateTime, Integer, Text, func
-
 from database import Base
+from sqlalchemy import Column, DateTime, Integer, Text, func
 
 
 class Idea(Base):

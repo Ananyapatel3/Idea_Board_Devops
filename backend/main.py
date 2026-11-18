@@ -3,12 +3,11 @@ import os
 
 import models
 import schemas
+from database import Base, engine, get_db
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
-from database import Base, engine, get_db
 
 Base.metadata.create_all(bind=engine)
 
