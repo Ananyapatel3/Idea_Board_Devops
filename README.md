@@ -214,6 +214,8 @@ kubectl get deployments,pods,services,pvc -n idea-board
 
 `--load-restrictor LoadRestrictionsNone` is required because the local overlay references shared manifests outside its directory. Open [http://localhost](http://localhost) and check the API at [http://localhost/api/ideas](http://localhost/api/ideas). The local PostgreSQL PVC retains database data; do not delete it unless you intend to remove that data. This demonstrates local Kubernetes only—it does not deploy to AWS or GCP or provide a public cloud URL.
 
+The Docker Compose app at [http://localhost:3000](http://localhost:3000) and the Kubernetes app at [http://localhost](http://localhost) use separate PostgreSQL databases. Ideas created in one are not automatically copied to the other. GitHub stores this project's source and configuration, not the runtime ideas; the cloud deployment workflow has not been run to create a public app URL.
+
 ## Terraform and cloud setup
 
 The Terraform code describes the network, managed Kubernetes cluster, private PostgreSQL database, and container registry for each cloud:
