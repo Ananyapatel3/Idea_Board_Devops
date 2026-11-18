@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Use Gemini to explain deployment observations; never control deployment decisions."""
 
 import argparse
