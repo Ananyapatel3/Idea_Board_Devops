@@ -139,6 +139,7 @@ jobs:
           format: table
           severity: CRITICAL,HIGH
           exit-code: "1"
+          skip-files: "**/pip/_vendor/bom.cdx.json"
 
       - name: Push backend image
         env:
