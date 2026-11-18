@@ -158,6 +158,62 @@ I use the manifests in `k8s/` to create the `idea-board` namespace, backend Conf
 
 I leave the database Secret out of the Kustomize resource list. During deployment, the workflow creates `backend-secrets` from a sensitive Terraform output. `backend-secret.example.yaml` is only an example—don't apply its placeholder values.
 
+### Local Kubernetes Deployment (Docker Desktop)
+
+The optional `k8s/overlays/local/` configuration runs the app on a single-node Docker Desktop Kubernetes cluster. It adds a PostgreSQL pod with a persistent volume and applies local probe settings and one replica per app Deployment. It is separate from the base Kubernetes configuration above, which expects a cloud-managed PostgreSQL database.
+
+Prerequisites:
+
+- Docker Desktop with Kubernetes enabled and the `docker-desktop` context available.
+- `kubectl` and access to the GHCR images referenced in `k8s/overlays/local/kustomization.yaml`.
+
+Select and check the local cluster:
+
+```powershell
+kubectl config use-context docker-desktop
+kubectl get nodes
+```
+
+Create the namespace before its local database Secret:
+
+```powershell
+kubectl apply -f .\k8s\namespace.yml
+```
+
+On a new local cluster, create `backend-secrets` with a randomly generated local-only password. This PowerShell command sends the Secret directly to Kubernetes and does not print the credential. Run it only once for a new database; if the Secret already exists, keep reusing it so its password stays consistent with the database on the persistent volume.
+
+```powershell
+$bytes = New-Object byte[] 32
+$rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$rng.GetBytes($bytes)
+$password = [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_')
+$rng.Dispose()
+$secretJson = @{
+    apiVersion = 'v1'
+    kind = 'Secret'
+    metadata = @{ name = 'backend-secrets'; namespace = 'idea-board' }
+    type = 'Opaque'
+    stringData = @{
+        POSTGRES_PASSWORD = $password
+        DATABASE_URL = "postgresql+psycopg2://user:$password@postgres:5432/ideas"
+    }
+} | ConvertTo-Json -Depth 5
+$secretJson | kubectl apply -f -
+Remove-Variable password, secretJson, bytes, rng
+```
+
+Render and apply the local configuration:
+
+```powershell
+kubectl kustomize --load-restrictor LoadRestrictionsNone .\k8s\overlays\local | kubectl apply -f -
+kubectl rollout status deployment/postgres -n idea-board
+kubectl rollout status deployment/backend -n idea-board
+kubectl rollout status deployment/frontend -n idea-board
+kubectl get deployments,pods,services,pvc -n idea-board
+```
+
+`--load-restrictor LoadRestrictionsNone` is required because the local overlay references shared manifests outside its directory. Open [http://localhost](http://localhost) and check the API at [http://localhost/api/ideas](http://localhost/api/ideas). The local PostgreSQL PVC retains database data; do not delete it unless you intend to remove that data. This demonstrates local Kubernetes only—it does not deploy to AWS or GCP or provide a public cloud URL.
+
 ## Terraform and cloud setup
 
 The Terraform code describes the network, managed Kubernetes cluster, private PostgreSQL database, and container registry for each cloud:

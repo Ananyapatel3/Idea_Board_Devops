@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../namespace.yml
+  - ../../backend-configmap.yaml
+  - ../../backend-deployment.yaml
+  - ../../backend-service.yaml
+  - ../../frontend-deployment.yaml
+  - ../../frontend-service.yaml
+  - ../../local-postgres.yaml
+images:
+  - name: ghcr.io/sirhashir/idea-board-backend
+    newName: ghcr.io/ananyapatel3/idea-board-backend
+    newTag: b33d49bb8e034036ba3e124ca97ca532bcc2bdeb
+  - name: ghcr.io/sirhashir/idea-board-frontend
+    newName: ghcr.io/ananyapatel3/idea-board-frontend
+    newTag: b33d49bb8e034036ba3e124ca97ca532bcc2bdeb
+replicas:
+  - name: backend
+    count: 1
+  - name: frontend
+    count: 1
+patches:
+  - path: backend-patch.yaml
+  - path: frontend-patch.yaml
