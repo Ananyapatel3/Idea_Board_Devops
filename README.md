@@ -73,9 +73,9 @@ To run the app locally, install Docker Desktop and enable its Linux container en
    Invoke-RestMethod http://localhost:8000/health
    ```
 
-4. On the same computer where Docker Compose is running, open `http://localhost:3000`, submit an idea, and check that it appears in the list. The backend stores it in PostgreSQL.
+4. On the same computer where Docker Compose is running, open [http://127.0.0.1:3000](http://127.0.0.1:3000), submit an idea, and check that it appears in the list. The backend stores it in PostgreSQL.
 
-The API documentation is at `http://localhost:8000/docs`. The database is published on host port `5433` for local tools such as pgAdmin:
+The API documentation is at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The database is published on host port `5433` for local tools such as pgAdmin:
 
 | pgAdmin field | Value |
 |---|---|
@@ -212,9 +212,9 @@ kubectl rollout status deployment/frontend -n idea-board
 kubectl get deployments,pods,services,pvc -n idea-board
 ```
 
-`--load-restrictor LoadRestrictionsNone` is required because the local overlay references shared manifests outside its directory. While Docker Desktop Kubernetes is running on your computer, open `http://localhost` in a browser on that same computer and check the API at `http://localhost/api/ideas`. These are local-only addresses; they won't open the app for someone browsing GitHub from another computer. The local PostgreSQL PVC retains database data; do not delete it unless you intend to remove that data. This demonstrates local Kubernetes only—it does not deploy to AWS or GCP or provide a public cloud URL.
+`--load-restrictor LoadRestrictionsNone` is required because the local overlay references shared manifests outside its directory. While Docker Desktop Kubernetes is running on your computer, open [http://127.0.0.1](http://127.0.0.1) in a browser on that same computer and check the API at [http://127.0.0.1/api/ideas](http://127.0.0.1/api/ideas). The IPv4 loopback address avoids `localhost` resolving to IPv6 on some systems. These links work only on a computer where the matching local app is running; they do not make the app public for other GitHub visitors. The local PostgreSQL PVC retains database data; do not delete it unless you intend to remove that data. This demonstrates local Kubernetes only—it does not deploy to AWS or GCP or provide a public cloud URL.
 
-The Docker Compose app at `http://localhost:3000` and the Kubernetes app at `http://localhost` use separate PostgreSQL databases. Ideas created in one are not automatically copied to the other. GitHub stores this project's source and configuration, not the runtime ideas; the cloud deployment workflow has not been run to create a public app URL. A public link requires deploying the app to a publicly reachable host; AWS/GCP deployment is not currently completed.
+The Docker Compose app at [http://127.0.0.1:3000](http://127.0.0.1:3000) and the Kubernetes app at [http://127.0.0.1](http://127.0.0.1) use separate PostgreSQL databases. Ideas created in one are not automatically copied to the other. GitHub stores this project's source and configuration, not the runtime ideas; the cloud deployment workflow has not been run to create a public app URL. A public link requires deploying the app to a publicly reachable host; AWS/GCP deployment is not currently completed.
 
 ## Terraform and cloud setup
 
